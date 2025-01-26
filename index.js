@@ -1,24 +1,23 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const express = require("express")
+const bodyParser = require("body-parser")
+const cors = require("cors")
+require("dotenv").config()
 
-const { onRequest } = require("firebase-functions/v2/https")
-const logger = require("firebase-functions/logger")
+const itemRoutes = require("./routes/itemRoutes")
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const app = express()
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+app.use(cors())
+app.use(bodyParser.json())
 
-const app = require("./server") // Import your existing Express app
+// Routes
+app.use("/items", itemRoutes)
 
-// Export the app as a Cloud Function
-exports.app = onRequest(app)
+// Create HTTP server
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+	console.log(`Server running on http://localhost:${PORT}`)
+})
+
+module.exports = app
