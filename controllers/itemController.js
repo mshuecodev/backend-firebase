@@ -1,5 +1,6 @@
 // controllers/itemController.js
 const db = require("../utils/firebase")
+const { convertObjtoArray } = require("../utils/convertObjtoArray")
 
 const ItemController = {
 	// Create a new item (auto-generate ID)
@@ -21,7 +22,11 @@ const ItemController = {
 	getAll: async (req, res) => {
 		try {
 			const snapshot = await db.ref("items").once("value")
-			res.status(200).json(snapshot.val() || {})
+			const data = snapshot.val()
+
+			// Convert object to array
+			const list = await convertObjtoArray(data)
+			res.status(200).json(list || [])
 		} catch (error) {
 			res.status(500).json({ message: "Failed to fetch items.", error })
 		}
@@ -33,6 +38,7 @@ const ItemController = {
 		try {
 			const snapshot = await db.ref(`items/${id}`).once("value")
 			const item = snapshot.val()
+
 			if (!item) {
 				return res.status(404).json({ message: "Item not found." })
 			}
